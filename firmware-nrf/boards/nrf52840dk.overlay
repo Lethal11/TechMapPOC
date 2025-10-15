@@ -1,0 +1,98 @@
+/*
+ * Device Tree Overlay for NRF52840 DK + PN532 NFC Module
+ * Board: nrf52840dk_nrf52840
+ * Zephyr version: 3.5.0
+ * 
+ * Pin Assignments:
+ * PN532 Module <-> NRF52840 DK
+ * VCC  -> VDD (3.3V)
+ * GND  -> GND
+ * SDA  -> P0.26 (I2C SDA) - Pin 15 on P3 header
+ * SCL  -> P0.27 (I2C SCL) - Pin 16 on P3 header
+ * IRQ  -> P0.28 (GPIO)    - Pin 17 on P3 header
+ * RST  -> P0.29 (GPIO)    - Pin 18 on P3 header
+ */
+
+/ {
+    aliases {
+        pn532irq = &pn532_irq_gpio;
+        pn532rst = &pn532_rst_gpio;
+    };
+
+    pn532_control {
+        compatible = "gpio-leds";
+        pn532_irq_gpio: pn532_irq {
+            gpios = <&gpio0 28 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+            label = "PN532 IRQ Pin";
+        };
+        pn532_rst_gpio: pn532_rst {
+            gpios = <&gpio0 29 GPIO_ACTIVE_HIGH>;
+            label = "PN532 Reset Pin";
+        };
+    };
+};
+
+/* I2C Configuration - Use arduino_i2c which is already configured */
+&arduino_i2c {
+    status = "okay";
+    clock-frequency = <I2C_BITRATE_FAST>;
+};
+
+/* Alternative: Use i2c0 with explicit pin configuration */
+&i2c0 {
+    compatible = "nordic,nrf-twi";
+    status = "disabled";  /* Disable if using arduino_i2c above */
+};
+
+/* LEDs on nRF52840 DK */
+&led0 {
+    gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
+    label = "Green LED 1 - NFC Field";
+};
+
+&led1 {
+    gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
+    label = "Green LED 2 - Card Detect";
+};
+
+&led2 {
+    gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
+    label = "Green LED 3 - Status";
+};
+
+&led3 {
+    gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;
+    label = "Green LED 4 - Error";
+};
+
+/* UART for logging */
+&uart0 {
+    status = "okay";
+    current-speed = <115200>;
+};
+
+/* GPIO */
+&gpio0 {
+    status = "okay";
+};
+
+/* Disable unused peripherals to save resources */
+&i2c1 {
+    status = "disabled";
+};
+
+&pwm0 {
+    status = "disabled";
+};
+
+&spi0 {
+    status = "disabled";
+};
+
+&spi1 {
+    status = "disabled";
+};
+
+&spi2 {
+    status = "disabled";
+};

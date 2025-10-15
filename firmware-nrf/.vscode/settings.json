@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "kernel.h": "c",
+        "ble_passport_service.h": "c",
+        "log.h": "c",
+        "i2c.h": "c"
+    }
+}

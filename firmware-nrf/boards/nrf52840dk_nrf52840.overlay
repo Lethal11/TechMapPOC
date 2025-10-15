@@ -1,0 +1,88 @@
+/*
+ * Device Tree Overlay for NRF52840 DK + PN532 NFC Module
+ */
+
+/ {
+	aliases {
+		pn532irq = &pn532_irq_gpio;
+		pn532rst = &pn532_rst_gpio;
+	};
+
+	pn532_control {
+		compatible = "gpio-keys";  /* FIXED: Changed from "gpio-leds" to "gpio-keys" */
+		pn532_irq_gpio: pn532_irq {
+			gpios = <&gpio0 28 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "PN532 IRQ Pin";
+		};
+		pn532_rst_gpio: pn532_rst {
+			gpios = <&gpio0 29 GPIO_ACTIVE_HIGH>;
+			label = "PN532 Reset Pin";
+		};
+	};
+};
+
+/* Pin control for I2C0 (arduino_i2c) */
+&pinctrl {
+	i2c0_default: i2c0_default {
+		group1 {
+			psels = <NRF_PSEL(TWIM_SDA, 0, 26)>,
+					<NRF_PSEL(TWIM_SCL, 0, 27)>;
+		};
+	};
+
+	i2c0_sleep: i2c0_sleep {
+		group1 {
+			psels = <NRF_PSEL(TWIM_SDA, 0, 26)>,
+					<NRF_PSEL(TWIM_SCL, 0, 27)>;
+			low-power-enable;
+		};
+	};
+};
+
+/* Enable I2C0 (also known as arduino_i2c) */
+&i2c0 {
+	compatible = "nordic,nrf-twim";
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;  /* IMPROVED: Use constant instead of raw value */
+	pinctrl-0 = <&i2c0_default>;
+	pinctrl-1 = <&i2c0_sleep>;
+	pinctrl-names = "default", "sleep";
+};
+
+/* LEDs */
+&led0 {
+	gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
+};
+
+&led1 {
+	gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
+};
+
+&led2 {
+	gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
+};
+
+&led3 {
+	gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;
+};
+
+/* Disable unused peripherals to save power */
+&i2c1 {
+	status = "disabled";
+};
+
+&spi0 {
+	status = "disabled";
+};
+
+&spi1 {
+	status = "disabled";
+};
+
+&spi2 {
+	status = "disabled";
+};
+
+&pwm0 {
+	status = "disabled";
+};
